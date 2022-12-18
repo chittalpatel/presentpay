@@ -1,0 +1,26 @@
+{% extends "registration_base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+    <div class="p-5">
+        <div class="text-center">
+            <h1 class="h4 text-gray-900 mb-4">Login</h1>
+        </div>
+        <form class="user" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.username.label_tag }}
+                {{ form.username|add_class:'form-control form-control-user' }}
+            </div>
+            <div class="form-group">
+                                {{ form.password.label_tag }}
+                {{ form.password|add_class:'form-control form-control-user' }}
+            </div>
+            <input type="submit" class="btn btn-primary btn-user btn-block" value="Login">
+        </form>
+        <hr>
+        <div class="text-center">
+            <a class="small" href="{% url 'password_reset' %}">Forgot Password?</a>
+        </div>
+    </div>
+
+{% endblock %}

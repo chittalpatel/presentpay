@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+    <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Employees</h1>
+            <a href="{% url 'employee_create' %}"
+               class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                    class="fas fa-download fa-sm text-white-50"></i> &nbsp Add
+                Employee</a>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row row-cols-md-3 row-cols-sm-1">
+            <div class="col">
+                <div class="form-group">
+                    <label for="id_search">Search</label>
+                    <input type="text" name="search"
+                           class="form-control form-control-user"
+                           id="id_search">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="id_role">Role</label>
+                    <select name="role" class="form-control form-control-user"
+                            id="id_role">
+                        <option value="All" selected>All</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="id_department">Department</label>
+                    <select name="department" class="form-control form-control-user"
+                            id="id_department">
+                        <option value="All" selected>All</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%"
+                           cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Joined date</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Joined date</th>
+                            <th>Actions</th>
+                        </tr>
+                        </tfoot>
+                        <tbody>
+                        {% for obj in employees %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'employee_detail' pk=obj.id %}">
+                                        {{ obj.full_name|default:"" }}
+                                    </a>
+                                </td>
+                                <td>{{ obj.phone|default:"" }}</td>
+                                <td>{{ obj.role|default:"" }}</td>
+                                <td>{{ obj.department|default:"" }}</td>
+                                <td>{{ obj.age|default:"" }}</td>
+                                <td>{{ obj.gender|default:"" }}</td>
+                                <td>{{ obj.joined_date|default:"" }}</td>
+                                <td style="text-align: center">
+                                    <a href="{% url 'employee_update' pk=obj.id %}"
+                                       class="text-info">
+                                        <i class="fas fa-pencil"></i>
+                                    </a>
+                                    &nbsp;
+                                    <a href="#" class="text-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        let map_choice = function (column, id_select) {
+            let select = $('#' + id_select).on('change', function () {
+                let search_val = $(this).val()
+                if (search_val === 'All') {
+                    column.search('^.*$', true, false).draw();
+                } else {
+                    var val = $.fn.dataTable.util.escapeRegex(search_val);
+                    column.search(val ? '^' + val + '$' : '', true, false).draw();
+                }
+            })
+            column
+                .data()
+                .unique()
+                .sort()
+                .each(function (d, j) {
+                    select.append('<option value="' + d + '">' + d + '</option>');
+                });
+        }
+        $(document).ready(function () {
+            let table = $('#dataTable').DataTable({
+                paging: true,
+                ordering: true,
+                info: false,
+                searching: true,
+                order: [],
+                drawCallback: function (settings) {
+                    var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+                    pagination.toggle(this.api().page.info().pages > 1);
+                },
+                initComplete: function () {
+                    map_choice(this.api().column(2), 'id_role');
+                    map_choice(this.api().column(3), 'id_department');
+                },
+                dom: 'lrt',
+            });
+            $('#id_search').on('keyup', function () {
+                table.search(this.value).draw();
+            });
+        })
+    </script>
+{% endblock %}

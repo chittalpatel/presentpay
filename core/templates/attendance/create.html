@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+    <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Add Attendance</h1>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%"
+                           cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th>Employee</th>
+                            {% for d in dates %}
+                                <th data-date="{{ d|date:"c" }}">{{ d|date:"D, M j" }}
+                                    {% if forloop.last %}(today){% endif %}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for info in data.items %}
+                            <tr data-empid="{{ info.0.id }}"
+                                data-empname="{{ info.0.full_name }}">
+                                <td>
+                                    {{ info.0.full_name }}
+                                </td>
+                                {% for dt in info.1.items %}
+                                    <td id="{{ info.0.id }}_{{ dt.0|date:"c" }}">
+                                        {% for attn in dt.1 %}
+                                            {% if attn.is_valid %}
+                                                <a href="#updateAttendanceModal"
+                                                   data-attnid="{{ attn.id }}"
+                                                   data-start="{{ attn.start|time:"f A" }}"
+                                                   data-end="
+
+
+
+                                                           {% if attn.end %}{{ attn.end|time:"f A" }}{% endif %}"
+                                                   class="update-attendance btn btn-info btn-icon-split m-1">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                                    <span class="text">
+                                            {{ attn.start|time:"f A" }} -
+                                                        {% if attn.end %}
+                                                            {{ attn.end|time:"f A" }}{% else %}
+                                                            (?){% endif %}
+                                        </span>
+                                                </a>
+                                            {% else %}
+                                                <a href="#updateAttendanceModal"
+                                                   data-attnid="{{ attn.id }}"
+                                                   data-start="{{ attn.start|time:"f A" }}"
+                                                   data-end="
+
+
+
+                                                           {% if attn.end %}{{ attn.end|time:"f A" }}{% endif %}"
+                                                   class="update-attendance btn btn-warning btn-icon-split m-1">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </span>
+                                                    <span class="text">
+                                            {{ attn.start|time:"f A" }} -
+                                                        {% if attn.end %}
+                                                            {{ attn.end|time:"f A" }}{% else %}
+                                                            (?){% endif %}
+                                        </span>
+                                                </a>
+                                            {% endif %}
+                                            <br>
+                                        {% endfor %}
+                                        <a href="#addAttendanceModal"
+                                           data-toggle="modal"
+                                           class="add-attendance btn btn-success btn-icon-split btn-sm m-1">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+                                            <span class="text">Add</span>
+                                        </a>
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="updateAttendanceModal" tabindex="-1" role="dialog"
+         aria-labelledby="updateAttendanceLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form>
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="row row-cols-md-2 row-cols-sm-1">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="uid_employee">Employee</label>
+                                    <select name="employee"
+                                            class="form-control form-control-user"
+                                            id="uid_employee">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="uid_date">Date</label>
+                                    <select name="date"
+                                            class="form-control form-control-user"
+                                            id="uid_date">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="uid_start">Start</label>
+                                    <input name="start"
+                                           class="form-control form-control-user"
+                                           id="uid_start">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="uid_end">End</label>
+                                    <input name="end"
+                                           class="form-control form-control-user"
+                                           id="uid_end">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="attnId">
+                        <button id="updateAttendanceBtn" type="button"
+                                class="btn btn-success">Update
+                        </button>
+                        <button id="deleteAttendanceBtn" class="btn btn-danger"
+                                type="button">Delete
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button"
+                                data-dismiss="modal">Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addAttendanceModal" tabindex="-1" role="dialog"
+         aria-labelledby="attendanceLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form>
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="row row-cols-md-2 row-cols-sm-1">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="id_employee">Employee</label>
+                                    <select name="employee"
+                                            class="form-control form-control-user"
+                                            id="id_employee">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="id_date">Date</label>
+                                    <select name="date"
+                                            class="form-control form-control-user"
+                                            id="id_date">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="id_start">Start</label>
+                                    <input name="start"
+                                           class="form-control form-control-user"
+                                           id="id_start">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="id_end">End</label>
+                                    <input name="end"
+                                           class="form-control form-control-user"
+                                           id="id_end">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="addAttendanceBtn" type="button"
+                                class="btn btn-success">Add
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button"
+                                data-dismiss="modal">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+{% block script %}
+    <script>
+        let table = $('#dataTable').DataTable({
+            paging: false,
+            ordering: true,
+            info: false,
+            searching: true,
+            columnDefs: [
+                {targets: [1, 2, 3], searchable: false, orderable: false}
+            ]
+        });
+        $('#uid_start').timepicker({
+            uiLibrary: 'bootstrap4',
+            format: 'h:MM TT'
+        });
+        $('#uid_end').timepicker({
+            uiLibrary: 'bootstrap4',
+            format: 'h:MM TT'
+        });
+        $('#id_start').timepicker({
+            uiLibrary: 'bootstrap4',
+            format: 'h:MM TT'
+        });
+        $('#id_end').timepicker({
+            uiLibrary: 'bootstrap4',
+            format: 'h:MM TT'
+        });
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        $(document).on("click", ".update-attendance", function () {
+            let attnId = $(this).data('attnid');
+            let start = $(this).data('start');
+            let end = $(this).data('end');
+            let empId = $(this).closest('tr').data('empid');
+            let empName = $(this).closest('tr').data('empname');
+            let dateHeader = $(this).closest('table').find('th').eq($(this).closest('td').index());
+            $('#uid_employee')
+                .find('option')
+                .remove()
+                .end()
+                .append(`<option value="${empId}" selected>${empName}</option>`);
+            $('#uid_date')
+                .find('option')
+                .remove()
+                .end()
+                .append(`<option value="${dateHeader.data('date')}" selected>${dateHeader.text()}</option>`);
+            $('#uid_start').val(start);
+            $('#uid_end').val(end);
+            $('#attnId').val(attnId);
+            $('#updateAttendanceModal').modal('show');
+        });
+
+        $(document).on("click", ".add-attendance", function () {
+            let empId = $(this).closest('tr').data('empid');
+            let empName = $(this).closest('tr').data('empname');
+            let dateHeader = $(this).closest('table').find('th').eq($(this).closest('td').index());
+            $('#id_employee')
+                .find('option')
+                .remove()
+                .end()
+                .append(`<option value="${empId}" selected>${empName}</option>`);
+            $('#id_date')
+                .find('option')
+                .remove()
+                .end()
+                .append(`<option value="${dateHeader.data('date')}" selected>${dateHeader.text()}</option>`);
+            $('#id_start').val(new Date().toLocaleString(
+                'en-US', {hour: 'numeric', minute: 'numeric', hour12: true}
+            ));
+            $('#id_end').val('');
+        });
+
+        function to_12h(time) {
+            return new Date('1970-01-01T' + time + 'Z')
+                .toLocaleTimeString('en-US',
+                    {timeZone: 'UTC', hour12: true, hour: 'numeric', minute: 'numeric'}
+                );
+        }
+
+        function populate_cell(data, empId, date) {
+            let html = ''
+            for (let i in data) {
+                let d = data[i]
+                let start_time = to_12h(d.start);
+                let button_cls = 'btn-warning'
+                let button_icon = 'fa-exclamation-triangle'
+                if (d.is_valid) {
+                    button_cls = 'btn-info'
+                    button_icon = 'fa-check'
+                }
+                let end_time = '(?)'
+                let end_time_data = ''
+                if (d.end) {
+                    end_time = to_12h(d.end)
+                    end_time_data = end_time
+                }
+                html += `
+                    <a href="#updateAttendanceModal" data-attnid="${d.id}"
+                    data-start="${start_time}"
+                    data-end="${end_time_data}"
+                    class="update-attendance btn ${button_cls} btn-icon-split m-1">
+                        <span class="icon text-white-50">
+                            <i class="fas ${button_icon}"></i>
+                        </span>
+                        <span class="text">${start_time} - ${end_time}</span>
+                    </a>
+                    <br>
+                `
+            }
+            html += `
+            <a href="#addAttendanceModal"
+               data-toggle="modal"
+               class="add-attendance btn btn-success btn-icon-split btn-sm m-1">
+            <span class="icon text-white-50">
+                <i class="fas fa-plus"></i>
+            </span>
+                <span class="text">Add</span>
+            </a>
+            `
+            $('#' + empId + '_' + date).html(html)
+        }
+
+        $("#addAttendanceBtn").click(function () {
+            let emp_id = $("#id_employee").find(":selected").val();
+            let date = $("#id_date").find(":selected").val();
+            let payload = {
+                'employee_id': emp_id,
+                'date': date,
+                'start': $("#id_start").val(),
+                'end': $("#id_end").val(),
+            }
+            $.ajax({
+                url: '/attendance/',
+                type: "post",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                data: payload,
+                success: function (d) {
+                    populate_cell(d.data, emp_id, date)
+                    $('#addAttendanceModal').modal('hide');
+                }
+            });
+        });
+
+        $("#updateAttendanceBtn").click(function () {
+            let emp_id = $("#uid_employee").find(":selected").val();
+            let date = $("#uid_date").find(":selected").val();
+            let attnId = $("#attnId").val();
+            let payload = {
+                'start': $("#uid_start").val(),
+                'end': $("#uid_end").val(),
+            }
+            $.ajax({
+                url: '/attendance/' + attnId + "/update/",
+                type: "post",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                data: payload,
+                success: function (d) {
+                    populate_cell(d.data, emp_id, date)
+                    $('#updateAttendanceModal').modal('hide');
+                }
+            });
+        });
+
+        $("#deleteAttendanceBtn").click(function () {
+            let emp_id = $("#uid_employee").find(":selected").val();
+            let date = $("#uid_date").find(":selected").val();
+            let attnId = $("#attnId").val();
+            $.ajax({
+                url: '/attendance/' + attnId + "/delete/",
+                type: "post",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                success: function (d) {
+                    populate_cell(d.data, emp_id, date)
+                    $('#updateAttendanceModal').modal('hide');
+                }
+            });
+        });
+
+    </script>
+{% endblock %}
