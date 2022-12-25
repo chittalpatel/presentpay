@@ -5,7 +5,7 @@ from core.models import Department, Employee, Attendance
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'company_name')
+    list_display = ("name", "company_name")
 
     def company_name(self, obj):
         return obj.company.name
@@ -13,7 +13,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'role', 'hourly_pay', 'department', 'company')
+    list_display = ("full_name", "role", "hourly_pay", "department", "company")
 
     def company(self, obj):
         return obj.department.company.name
@@ -21,7 +21,7 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 @admin.register(Attendance)
 class AttendanceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'date', 'start', 'end')
+    list_display = ("id", "name", "date", "start", "end")
 
     def name(self, obj):
         return obj.employee.full_name

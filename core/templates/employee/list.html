@@ -56,7 +56,6 @@
                             <th>Age</th>
                             <th>Gender</th>
                             <th>Joined date</th>
-                            <th>Actions</th>
                         </tr>
                         </thead>
                         <tfoot>
@@ -68,7 +67,6 @@
                             <th>Age</th>
                             <th>Gender</th>
                             <th>Joined date</th>
-                            <th>Actions</th>
                         </tr>
                         </tfoot>
                         <tbody>
@@ -85,16 +83,6 @@
                                 <td>{{ obj.age|default:"" }}</td>
                                 <td>{{ obj.gender|default:"" }}</td>
                                 <td>{{ obj.joined_date|default:"" }}</td>
-                                <td style="text-align: center">
-                                    <a href="{% url 'employee_update' pk=obj.id %}"
-                                       class="text-info">
-                                        <i class="fas fa-pencil"></i>
-                                    </a>
-                                    &nbsp;
-                                    <a href="#" class="text-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </td>
                             </tr>
                         {% endfor %}
 

@@ -18,6 +18,11 @@ urlpatterns = [
         login_required(views.UpdateEmployeeView.as_view()),
         name="employee_update",
     ),
+    path(
+        "employees/attendance/<int:pk>/",
+        views.list_employee_attendances,
+        name="employee_attendance",
+    ),
     path("attendance/", views.attendance, name="attendance"),
     path(
         "attendance/<int:attn_id>/update/",

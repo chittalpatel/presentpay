@@ -3,92 +3,117 @@
 {% block content %}
     <div class="container-fluid">
         <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Add Attendance</h1>
+        <div class="d-sm-flex align-items-center justify-content-between mb-5">
+            <div class="col-10">
+                <h1 class="h3 mb-0 text-gray-800">{{ employee.full_name }}</h1>
+            </div>
+            <div class="col-2">
+                <a href="{% url 'employee_detail' pk=employee.id %}"
+                   class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm m-1"><i
+                        class="fas fa-pencil fa-sm text-white-50"></i>&nbsp View
+                    Employee</a>
+            </div>
         </div>
     </div>
     <div class="container-fluid">
         <div class="card shadow mb-4">
             <div class="card-body">
+                <form method="GET" action=".">
+                    <div class="row justify-content-center">
+                        <a href="#reportrange" id="reportrange"
+                           class="btn btn-light btn-icon-split m-2">
+                            <span id="daterange" class="text">&nbsp</span>
+                            <span class="icon text-gray-600">
+                                <i class="fas fa-calendar"></i>
+                            </span>
+                        </a>
+                        <input type="hidden" name="fromtodate" id="fromtodate">
+                        <input type="submit" class="btn btn-primary m-2" value="Go">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered" id="dataTable" width="100%"
-                           cellspacing="0">
+                           cellspacing="0" data-empid="{{ employee.id }}"
+                           data-empname="{{ employee.full_name }}">
                         <thead>
                         <tr>
-                            <th>Employee</th>
-                            {% for d in dates %}
-                                <th data-date="{{ d|date:"c" }}">{{ d|date:"D, M j" }}
-                                    {% if forloop.last %}(today){% endif %}</th>
-                            {% endfor %}
+                            <th>Date</th>
+                            <th>Attendance</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for info in data.items %}
-                            <tr data-empid="{{ info.0.id }}"
-                                data-empname="{{ info.0.full_name }}">
-                                <td>
-                                    <a href="{% url 'employee_detail' pk=info.0.id %}">
-                                        {{ info.0.full_name }}
-                                    </a>
+                            <tr>
+                                <td data-sort="{{ info.0.day }}">
+                                    {{ info.0|date:"F d, l" }}
                                 </td>
-                                {% for dt in info.1.items %}
-                                    <td id="{{ info.0.id }}_{{ dt.0|date:"c" }}">
-                                        {% for attn in dt.1 %}
-                                            {% if attn.is_valid %}
-                                                <a href="#updateAttendanceModal"
-                                                   data-attnid="{{ attn.id }}"
-                                                   data-start="{{ attn.start|time:"f A" }}"
-                                                   data-end="
+                                <td id="{{ info.0|date:"c" }}"
+                                    data-fdate="{{ info.0|date:"F d, l" }}">
+                                    {% for attn in info.1 %}
+                                        {% if attn.is_valid %}
+                                            <a href="#updateAttendanceModal"
+                                               data-attnid="{{ attn.id }}"
+                                               data-start="{{ attn.start|time:"f A" }}"
+                                               data-end="
 
 
 
 
-                                                           {% if attn.end %}{{ attn.end|time:"f A" }}{% endif %}"
-                                                   class="update-attendance btn btn-info btn-icon-split m-1">
+
+
+                                                       {% if attn.end %}{{ attn.end|time:"f A" }}{% endif %}"
+                                               class="update-attendance btn btn-info btn-icon-split m-1">
                                         <span class="icon text-white-50">
                                             <i class="fas fa-check"></i>
                                         </span>
-                                                    <span class="text">
+                                                <span class="text">
                                             {{ attn.start|time:"f A" }} -
-                                                        {% if attn.end %}
-                                                            {{ attn.end|time:"f A" }}{% else %}
-                                                            (?){% endif %}
+                                                    {% if attn.end %}
+                                                        {{ attn.end|time:"f A" }}{% else %}
+                                                        (?){% endif %}
                                         </span>
-                                                </a>
-                                            {% else %}
-                                                <a href="#updateAttendanceModal"
-                                                   data-attnid="{{ attn.id }}"
-                                                   data-start="{{ attn.start|time:"f A" }}"
-                                                   data-end="
+                                            </a>
+                                        {% else %}
+                                            <a href="#updateAttendanceModal"
+                                               data-attnid="{{ attn.id }}"
+                                               data-start="{{ attn.start|time:"f A" }}"
+                                               data-end="
 
 
 
 
-                                                           {% if attn.end %}{{ attn.end|time:"f A" }}{% endif %}"
-                                                   class="update-attendance btn btn-warning btn-icon-split m-1">
+
+
+                                                       {% if attn.end %}{{ attn.end|time:"f A" }}{% endif %}"
+                                               class="update-attendance btn btn-warning btn-icon-split m-1">
                                         <span class="icon text-white-50">
                                             <i class="fas fa-exclamation-triangle"></i>
                                         </span>
-                                                    <span class="text">
+                                                <span class="text">
                                             {{ attn.start|time:"f A" }} -
-                                                        {% if attn.end %}
-                                                            {{ attn.end|time:"f A" }}{% else %}
-                                                            (?){% endif %}
+                                                    {% if attn.end %}
+                                                        {{ attn.end|time:"f A" }}{% else %}
+                                                        (?){% endif %}
                                         </span>
-                                                </a>
-                                            {% endif %}
-                                            <br>
-                                        {% endfor %}
-                                        <a href="#addAttendanceModal"
-                                           data-toggle="modal"
-                                           class="add-attendance btn btn-success btn-icon-split btn-sm m-1">
+                                            </a>
+                                        {% endif %}
+                                        <br>
+                                    {% endfor %}
+                                    <a href="#addAttendanceModal"
+                                       data-toggle="modal"
+                                       class="add-attendance btn btn-success btn-icon-split btn-sm m-1">
                                         <span class="icon text-white-50">
                                             <i class="fas fa-plus"></i>
                                         </span>
-                                            <span class="text">Add</span>
-                                        </a>
-                                    </td>
-                                {% endfor %}
+                                        <span class="text">Add</span>
+                                    </a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -218,8 +243,8 @@
         </div>
     </div>
 
-
 {% endblock %}
+
 {% block script %}
     <script>
         let table = $('#dataTable').DataTable({
@@ -228,7 +253,7 @@
             info: false,
             searching: true,
             columnDefs: [
-                {targets: [1, 2, 3], searchable: false, orderable: false}
+                {targets: [1], searchable: false, orderable: false}
             ]
         });
         $('#uid_start').timepicker({
@@ -263,13 +288,14 @@
             return cookieValue;
         }
 
+        let empId = $('#dataTable').data('empid');
+        let empName = $('#dataTable').data('empname');
         $(document).on("click", ".update-attendance", function () {
             let attnId = $(this).data('attnid');
             let start = $(this).data('start');
             let end = $(this).data('end');
-            let empId = $(this).closest('tr').data('empid');
-            let empName = $(this).closest('tr').data('empname');
-            let dateHeader = $(this).closest('table').find('th').eq($(this).closest('td').index());
+            let date = $(this).closest('td').attr('id');
+            let fdate = $(this).closest('td').data('fdate');
             $('#uid_employee')
                 .find('option')
                 .remove()
@@ -279,7 +305,7 @@
                 .find('option')
                 .remove()
                 .end()
-                .append(`<option value="${dateHeader.data('date')}" selected>${dateHeader.text()}</option>`);
+                .append(`<option value="${date}" selected>${fdate}</option>`);
             $('#uid_start').val(start);
             $('#uid_end').val(end);
             $('#attnId').val(attnId);
@@ -287,9 +313,8 @@
         });
 
         $(document).on("click", ".add-attendance", function () {
-            let empId = $(this).closest('tr').data('empid');
-            let empName = $(this).closest('tr').data('empname');
-            let dateHeader = $(this).closest('table').find('th').eq($(this).closest('td').index());
+            let date = $(this).closest('td').attr('id');
+            let fdate = $(this).closest('td').data('fdate');
             $('#id_employee')
                 .find('option')
                 .remove()
@@ -299,7 +324,7 @@
                 .find('option')
                 .remove()
                 .end()
-                .append(`<option value="${dateHeader.data('date')}" selected>${dateHeader.text()}</option>`);
+                .append(`<option value="${date}" selected>${fdate}</option>`);
             $('#id_start').val(new Date().toLocaleString(
                 'en-US', {hour: 'numeric', minute: 'numeric', hour12: true}
             ));
@@ -353,11 +378,10 @@
                 <span class="text">Add</span>
             </a>
             `
-            $('#' + empId + '_' + date).html(html)
+            $('#' + date).html(html)
         }
 
         $("#addAttendanceBtn").click(function () {
-            let emp_id = $("#id_employee").find(":selected").val();
             let date = $("#id_date").find(":selected").val();
             let payload = {
                 'employee_id': emp_id,
@@ -418,5 +442,34 @@
             });
         });
 
+    </script>
+    <script type="text/javascript">
+        $(function () {
+
+            var start = moment("{{ start }}");
+            var end = moment("{{ end }}");
+
+            function cb(start, end) {
+                $('#daterange').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('#fromtodate').val(`${start.format()},${end.format()}`);
+            }
+
+            $('#reportrange').daterangepicker({
+                opens: 'right',
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            cb(start, end);
+
+        });
     </script>
 {% endblock %}

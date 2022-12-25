@@ -8,12 +8,8 @@
         </div>
     </div>
     <div class="container-fluid">
-        <form action="." method="POST">
-
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Update</button>
-        </form>
+        {% include "employee/employee_form.html" with btn_name="Update" %}
     </div>
+    <div class="container-fluid"><br></div>
 
 {% endblock %}

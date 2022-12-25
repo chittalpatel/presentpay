@@ -1,5 +1,6 @@
 import datetime
 
+import dateutil.parser
 import pytz
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -25,7 +26,9 @@ def dashboard(request):
 @login_required
 def employee_list(request):
     employees = (
-        Employee.objects.filter(department__company=request.user.company)
+        Employee.objects.filter(
+            department__company=request.user.company, is_active=True
+        )
         .order_by("-id")
         .all()
     )
@@ -33,7 +36,7 @@ def employee_list(request):
 
 
 def get_employee_by_pk(pk, user):
-    employee = Employee.objects.filter(pk=pk).first()
+    employee = Employee.objects.filter(pk=pk, is_active=True).first()
     if employee and employee.department.company == user.company:
         return employee
     raise PermissionDenied
@@ -167,3 +170,35 @@ def delete_attendance(request, attn_id):
         attn.is_deleted = True
         attn.save()
         return get_attendance_by_employee(employee=emp, date=attn.date)
+
+
+@login_required
+def list_employee_attendances(request, pk):
+    emp = get_employee_by_pk(pk=pk, user=request.user)
+
+    date_range = request.GET.get("fromtodate")
+    if date_range:
+        start, end = date_range.split(",")
+        start = dateutil.parser.parse(start).date()
+        end = dateutil.parser.parse(end).date()
+    else:
+        india_tz = pytz.timezone("Asia/Kolkata")
+        start = datetime.datetime.now(india_tz).date()
+        end = start
+
+    date_map = {
+        (start + datetime.timedelta(days=x)): [] for x in range((end - start).days + 1)
+    }
+    attns = (
+        Attendance.objects.filter(employee=emp, date__gte=start, date__lte=end)
+        .order_by("date", "start")
+        .all()
+    )
+    for attn in attns:
+        if attn.date in date_map:
+            date_map[attn.date].append(attn)
+    return render(
+        request,
+        "attendance/employee_attendance.html",
+        {"data": date_map, "employee": emp, "start": start, "end": end},
+    )

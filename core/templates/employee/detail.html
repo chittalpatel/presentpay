@@ -3,12 +3,20 @@
 {% block content %}
     <div class="container-fluid">
         <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">{{ obj.full_name }}</h1>
-            <a href="{% url 'employee_update' pk=obj.id %}"
-               class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                    class="fas fa-pencil fa-sm text-white-50"></i>&nbsp Update
-                Employee</a>
+        <div class="d-sm-flex align-items-center justify-content-between mb-5">
+            <div class="col-8">
+                <h1 class="h3 mb-0 text-gray-800">{{ obj.full_name }}</h1>
+            </div>
+            <div class="col-4">
+                <a href="{% url 'employee_attendance' pk=obj.id %}"
+                   class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm m-1"><i
+                        class="fas fa-calendar fa-sm text-white-50"></i>&nbsp View
+                    Attendance</a>
+                <a href="{% url 'employee_update' pk=obj.id %}"
+                   class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm m-1"><i
+                        class="fas fa-pencil fa-sm text-white-50"></i>&nbsp Update
+                    Employee</a>
+            </div>
         </div>
     </div>
     <div class="container-fluid">
@@ -79,6 +87,127 @@
                         <div class="row row-cols-2 m-3">
                             <div class="col col-4">
                                 <b>
+                                    Email
+                                </b>
+                            </div>
+                            <div class="col col-8">
+                                {{ obj.email }}
+                            </div>
+                        </div>
+                        <hr class="sidebar-divider my-0">
+                        <div class="row row-cols-2 m-3">
+                            <div class="col col-4">
+                                <b>
+                                    Gender
+                                </b>
+                            </div>
+                            <div class="col col-8">
+                                {{ obj.gender }}
+                            </div>
+                        </div>
+                        <hr class="sidebar-divider my-0">
+                        <div class="row row-cols-2 m-3">
+                            <div class="col col-4">
+                                <b>
+                                    Birthday
+                                </b>
+                            </div>
+                            <div class="col col-8">
+                                {{ obj.date_of_birth }} ({{ obj.age }} years)
+                            </div>
+                        </div>
+                        <hr class="sidebar-divider my-0">
+                        <div class="row row-cols-2 m-3">
+                            <div class="col col-4">
+                                <b>
+                                    Address Line 1
+                                </b>
+                            </div>
+                            <div class="col col-8">
+                                {{ obj.address_line1 }}
+                            </div>
+                        </div>
+                        <hr class="sidebar-divider my-0">
+                        <div class="row row-cols-2 m-3">
+                            <div class="col col-4">
+                                <b>
+                                    Address Line 2
+                                </b>
+                            </div>
+                            <div class="col col-8">
+                                {{ obj.address_line2 }}
+                            </div>
+                        </div>
+                        <hr class="sidebar-divider my-0">
+                        <div class="row row-cols-2 m-3">
+                            <div class="col col-4">
+                                <b>
+                                    Address Line 3
+                                </b>
+                            </div>
+                            <div class="col col-8">
+                                {{ obj.address_line3 }}
+                            </div>
+                        </div>
+                        <hr class="sidebar-divider my-0">
+                        <div class="row row-cols-2 m-3">
+                            <div class="col col-4">
+                                <b>
+                                    City
+                                </b>
+                            </div>
+                            <div class="col col-8">
+                                {{ obj.city }}
+                            </div>
+                        </div>
+                        <hr class="sidebar-divider my-0">
+                        <div class="row row-cols-2 m-3">
+                            <div class="col col-4">
+                                <b>
+                                    State
+                                </b>
+                            </div>
+                            <div class="col col-8">
+                                {{ obj.state }}
+                            </div>
+                        </div>
+                        <hr class="sidebar-divider my-0">
+                        <div class="row row-cols-2 m-3">
+                            <div class="col col-4">
+                                <b>
+                                    Country
+                                </b>
+                            </div>
+                            <div class="col col-8">
+                                {{ obj.country }}
+                            </div>
+                        </div>
+                        <hr class="sidebar-divider my-0">
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4">
+                <div class="card-header" id="employmentDetails">
+                    <h2 class="mb-0">
+                        <button class="btn btn-light text-left"
+                                type="button" data-toggle="collapse"
+                                data-target="#collapseTwo"
+                                aria-expanded="true"
+                                aria-controls="collapseTwo">
+                            <h5>
+                                Employment Details
+                            </h5>
+                        </button>
+                    </h2>
+                </div>
+
+                <div id="collapseTwo" class="collapse show"
+                     aria-labelledby="employmentDetails"
+                     data-parent="#accordionExample">
+                    <div class="card-body">
+                        <div class="row row-cols-2 m-3">
+                            <div class="col col-4">
+                                <b>
                                     Department
                                 </b>
                             </div>
@@ -101,57 +230,25 @@
                         <div class="row row-cols-2 m-3">
                             <div class="col col-4">
                                 <b>
-                                    Birthday
+                                    Joined Date
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.date_of_birth }} ({{ obj.age }} years)
+                                {{ obj.joined_date }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
-                    </div>
-                </div>
-            </div>
-            <div class="card shadow mb-4">
-                <div class="card-header" id="headingTwo">
-                    <h2 class="mb-0">
-                        <button class="btn btn-light text-left collapsed"
-                                type="button" data-toggle="collapse"
-                                data-target="#collapseTwo"
-                                aria-expanded="false"
-                                aria-controls="collapseTwo">
-                            Collapsible Group Item #2
-                        </button>
-                    </h2>
-                </div>
-                <div id="collapseTwo" class="collapse"
-                     aria-labelledby="headingTwo"
-                     data-parent="#accordionExample">
-                    <div class="card-body">
-                        Some placeholder content for the second accordion
-                        panel. This panel is hidden by default.
-                    </div>
-                </div>
-            </div>
-            <div class="card shadow mb-4">
-                <div class="card-header" id="headingThree">
-                    <h2 class="mb-0">
-                        <button class="btn btn-light text-left collapsed"
-                                type="button" data-toggle="collapse"
-                                data-target="#collapseThree"
-                                aria-expanded="false"
-                                aria-controls="collapseThree">
-                            Collapsible Group Item #3
-                        </button>
-                    </h2>
-                </div>
-                <div id="collapseThree" class="collapse"
-                     aria-labelledby="headingThree"
-                     data-parent="#accordionExample">
-                    <div class="card-body">
-                        And lastly, the placeholder content for the third
-                        and final accordion panel. This panel is hidden by
-                        default.
+                        <div class="row row-cols-2 m-3">
+                            <div class="col col-4">
+                                <b>
+                                    Hourly Pay
+                                </b>
+                            </div>
+                            <div class="col col-8">
+                                {{ obj.hourly_pay }}
+                            </div>
+                        </div>
+                        <hr class="sidebar-divider my-0">
                     </div>
                 </div>
             </div>

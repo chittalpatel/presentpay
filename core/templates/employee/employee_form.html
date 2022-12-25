@@ -1,0 +1,240 @@
+<form action="." method="POST">
+
+    {% csrf_token %}
+
+    <div class="accordion" id="accordionExample">
+        <div class="card shadow mb-4">
+            <div class="card-header" id="personalDetails">
+                <h2 class="mb-0">
+                    <button class="btn btn-light text-left"
+                            type="button" data-toggle="collapse"
+                            data-target="#collapseOne"
+                            aria-expanded="true"
+                            aria-controls="collapseOne">
+                        <h5>
+                            Personal Details
+                        </h5>
+                    </button>
+                </h2>
+            </div>
+
+            <div id="collapseOne" class="collapse show"
+                 aria-labelledby="personalDetails"
+                 data-parent="#accordionExample">
+                <div class="card-body">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.first_name.field.required %}<b>{% endif %}
+                            {{ form.first_name.label_tag }}
+                            {% if form.first_name.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.first_name }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.middle_name.field.required %}
+                                <b>{% endif %}{{ form.middle_name.label_tag }}
+                            {% if form.middle_name.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.middle_name }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.last_name.field.required %}
+                                <b>{% endif %}{{ form.last_name.label_tag }}
+                            {% if form.last_name.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.phone.field.required %}
+                                <b>{% endif %}{{ form.phone.label_tag }}
+                            {% if form.phone.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.phone }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.email.field.required %}
+                                <b>{% endif %}{{ form.email.label_tag }}
+                            {% if form.email.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.email }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.gender.field.required %}
+                                <b>{% endif %}{{ form.gender.label_tag }}
+                            {% if form.gender.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.gender }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.date_of_birth.field.required %}
+                                <b>{% endif %}{{ form.date_of_birth.label_tag }}
+                            {% if form.date_of_birth.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.date_of_birth }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.address_line1.field.required %}
+                                <b>{% endif %}{{ form.address_line1.label_tag }}
+                            {% if form.address_line1.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.address_line1 }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.address_line2.field.required %}
+                                <b>{% endif %}{{ form.address_line2.label_tag }}
+                            {% if form.address_line2.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.address_line2 }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.address_line3.field.required %}
+                                <b>{% endif %}{{ form.address_line3.label_tag }}
+                            {% if form.address_line3.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.address_line3 }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.city.field.required %}
+                                <b>{% endif %}{{ form.city.label_tag }}
+                            {% if form.city.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.city }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.state.field.required %}
+                                <b>{% endif %}{{ form.state.label_tag }}
+                            {% if form.state.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.state }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.country.field.required %}
+                                <b>{% endif %}{{ form.country.label_tag }}
+                            {% if form.country.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.country }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                </div>
+            </div>
+        </div>
+        <div class="card shadow mb-4">
+            <div class="card-header" id="employmentDetails">
+                <h2 class="mb-0">
+                    <button class="btn btn-light text-left"
+                            type="button" data-toggle="collapse"
+                            data-target="#collapseTwo"
+                            aria-expanded="true"
+                            aria-controls="collapseTwo">
+                        <h5>
+                            Employment Details
+                        </h5>
+                    </button>
+                </h2>
+            </div>
+
+            <div id="collapseTwo" class="collapse show"
+                 aria-labelledby="employmentDetails"
+                 data-parent="#accordionExample">
+                <div class="card-body">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.department.field.required %}
+                                <b>{% endif %}{{ form.department.label_tag }}
+                            {% if form.department.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.department }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.role.field.required %}
+                                <b>{% endif %}{{ form.role.label_tag }}
+                            {% if form.role.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.role }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.joined_date.field.required %}
+                                <b>{% endif %}{{ form.joined_date.label_tag }}
+                            {% if form.joined_date.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.joined_date }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.hourly_pay.field.required %}
+                                <b>{% endif %}{{ form.hourly_pay.label_tag }}
+                            {% if form.hourly_pay.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.hourly_pay }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary"
+                style="width: 100%">{{ btn_name|default:"Submit" }}</button>
+    </div>
+</form>

@@ -62,8 +62,8 @@ def create_employees():
                 gender=profile.get("sex"),
                 address_line1=profile.get("address"),
                 city=random.choice(["Vadodara", "Surat", "Ahmedabad", "Rajkot"]),
-                state="GJ",
-                country="IN",
+                state="Gujarat",
+                country="India",
             )
 
 
