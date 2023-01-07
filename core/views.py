@@ -9,7 +9,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 
-from core.forms import EmployeeForm
+from core.forms import EmployeeForm, BillingFilterForm
 from core.models import Employee, Attendance
 from core.utils import str_to_time, str_to_date
 
@@ -45,7 +45,7 @@ def get_employee_by_pk(pk, user):
 @login_required
 def employee_detail(request, pk):
     employee = get_employee_by_pk(pk=pk, user=request.user)
-    return render(request, "employee/detail.html", {"obj": employee})
+    return render(request, "employee/detail.html", {"employee": employee})
 
 
 class CreateEmployeeView(CreateView):
@@ -119,7 +119,8 @@ def attendance(request):
             date=date,
             start=str_to_time(request.POST["start"]),
             end=str_to_time(request.POST["end"]),
-            hourly_pay=employee.hourly_pay,
+            hourly_pay=int(request.POST["pay"]),
+            break_hours=int(request.POST["break"]),
         )
         return get_attendance_by_employee(employee=employee, date=date)
 
@@ -137,6 +138,8 @@ def get_attendance_by_employee(employee, date):
                 "start": attn.start,
                 "end": attn.end,
                 "is_valid": attn.is_valid,
+                "pay": attn.hourly_pay,
+                "break": attn.break_hours,
             }
             for attn in attendances
         ]
@@ -158,6 +161,8 @@ def update_attendance(request, attn_id):
         emp = get_employee_by_pk(attn.employee_id, request.user)
         attn.start = str_to_time(request.POST["start"])
         attn.end = str_to_time(request.POST["end"])
+        attn.hourly_pay = int(request.POST["pay"])
+        attn.break_hours = int(request.POST["break"])
         attn.save()
         return get_attendance_by_employee(employee=emp, date=attn.date)
 
@@ -190,7 +195,9 @@ def list_employee_attendances(request, pk):
         (start + datetime.timedelta(days=x)): [] for x in range((end - start).days + 1)
     }
     attns = (
-        Attendance.objects.filter(employee=emp, date__gte=start, date__lte=end)
+        Attendance.objects.filter(
+            employee=emp, date__gte=start, date__lte=end, is_deleted=False
+        )
         .order_by("date", "start")
         .all()
     )
@@ -201,4 +208,52 @@ def list_employee_attendances(request, pk):
         request,
         "attendance/employee_attendance.html",
         {"data": date_map, "employee": emp, "start": start, "end": end},
+    )
+
+
+@login_required
+def view_employee_billing(request, pk):
+    emp = get_employee_by_pk(pk=pk, user=request.user)
+    month = request.GET.get("month")
+    year = request.GET.get("year")
+    if not (month and year):
+        month = datetime.date.today().month
+        year = datetime.date.today().year
+
+    data = {
+        "cost": 0,
+        "work_hours": 0,
+        "break_hours": 0,
+    }
+    attns = Attendance.objects.filter(
+        employee=emp,
+        date__year=year,
+        date__month=month,
+        is_deleted=False,
+    ).all()
+    for attn in attns:
+        if not attn.is_valid:
+            continue
+        work_hours = round(
+            (
+                datetime.datetime.combine(datetime.date.min, attn.end)
+                - datetime.datetime.combine(datetime.date.min, attn.start)
+            ).total_seconds()
+            / 3600,
+            2,
+        )
+        data["work_hours"] += work_hours
+        data["break_hours"] += attn.break_hours
+        data["cost"] += max(work_hours - attn.break_hours, 0) * attn.hourly_pay
+
+    data["cost"] = round(data["cost"], 2)
+    data["net_hours"] = max(data["work_hours"] - data["break_hours"], 0)
+    return render(
+        request,
+        "billing/employee_billing.html",
+        {
+            "data": data,
+            "employee": emp,
+            "form": BillingFilterForm(initial={"month": int(month), "year": int(year)}),
+        },
     )

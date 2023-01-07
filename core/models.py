@@ -37,6 +37,7 @@ class Employee(models.Model):
     state = models.CharField(max_length=2, blank=False, null=False)
     country = models.CharField(max_length=2, blank=False, null=False)
     hourly_pay = models.PositiveIntegerField(blank=False, null=False)
+    daily_break_hours = models.PositiveIntegerField(blank=False, null=False, default=1)
     is_active = models.BooleanField(blank=False, null=False, default=True)
 
     @property
@@ -69,6 +70,7 @@ class Attendance(models.Model):
     start = models.TimeField(blank=False, null=False)
     end = models.TimeField(blank=True, null=True)
     hourly_pay = models.PositiveIntegerField(blank=False, null=False)
+    break_hours = models.PositiveIntegerField(blank=False, null=False)
     is_deleted = models.BooleanField(default=False)
 
     @property

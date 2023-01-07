@@ -25,7 +25,9 @@
                         <tbody>
                         {% for info in data.items %}
                             <tr data-empid="{{ info.0.id }}"
-                                data-empname="{{ info.0.full_name }}">
+                                data-empname="{{ info.0.full_name }}"
+                                data-emppay="{{ info.0.hourly_pay }}"
+                                data-empbreak="{{ info.0.daily_break_hours }}">
                                 <td>
                                     <a href="{% url 'employee_detail' pk=info.0.id %}">
                                         {{ info.0.full_name }}
@@ -43,7 +45,10 @@
 
 
 
+
                                                            {% if attn.end %}{{ attn.end|time:"f A" }}{% endif %}"
+                                                   data-pay="{{ attn.hourly_pay }}"
+                                                   data-break="{{ attn.break_hours }}"
                                                    class="update-attendance btn btn-info btn-icon-split m-1">
                                         <span class="icon text-white-50">
                                             <i class="fas fa-check"></i>
@@ -64,7 +69,10 @@
 
 
 
+
                                                            {% if attn.end %}{{ attn.end|time:"f A" }}{% endif %}"
+                                                   data-pay="{{ attn.hourly_pay }}"
+                                                   data-break="{{ attn.break_hours }}"
                                                    class="update-attendance btn btn-warning btn-icon-split m-1">
                                         <span class="icon text-white-50">
                                             <i class="fas fa-exclamation-triangle"></i>
@@ -140,6 +148,22 @@
                                            id="uid_end">
                                 </div>
                             </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="uid_pay">Hourly Pay</label>
+                                    <input name="pay" type="number" min="0"
+                                           class="form-control form-control-user"
+                                           id="uid_pay">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="uid_break">Break Hours</label>
+                                    <input name="break" type="number" min="0"
+                                           class="form-control form-control-user"
+                                           id="uid_break">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -200,6 +224,22 @@
                                     <input name="end"
                                            class="form-control form-control-user"
                                            id="id_end">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="id_pay">Hourly Pay</label>
+                                    <input name="pay" type="number" min="0"
+                                           class="form-control form-control-user"
+                                           id="id_pay">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="id_break">Break Hours</label>
+                                    <input name="break" type="number" min="0"
+                                           class="form-control form-control-user"
+                                           id="id_break">
                                 </div>
                             </div>
                         </div>
@@ -267,6 +307,8 @@
             let attnId = $(this).data('attnid');
             let start = $(this).data('start');
             let end = $(this).data('end');
+            let pay = $(this).data('pay');
+            let breakh = $(this).data('break');
             let empId = $(this).closest('tr').data('empid');
             let empName = $(this).closest('tr').data('empname');
             let dateHeader = $(this).closest('table').find('th').eq($(this).closest('td').index());
@@ -282,6 +324,8 @@
                 .append(`<option value="${dateHeader.data('date')}" selected>${dateHeader.text()}</option>`);
             $('#uid_start').val(start);
             $('#uid_end').val(end);
+            $('#uid_pay').val(pay);
+            $('#uid_break').val(breakh);
             $('#attnId').val(attnId);
             $('#updateAttendanceModal').modal('show');
         });
@@ -289,6 +333,8 @@
         $(document).on("click", ".add-attendance", function () {
             let empId = $(this).closest('tr').data('empid');
             let empName = $(this).closest('tr').data('empname');
+            let empPay = $(this).closest('tr').data('emppay');
+            let empBreak = $(this).closest('tr').data('empbreak');
             let dateHeader = $(this).closest('table').find('th').eq($(this).closest('td').index());
             $('#id_employee')
                 .find('option')
@@ -304,6 +350,8 @@
                 'en-US', {hour: 'numeric', minute: 'numeric', hour12: true}
             ));
             $('#id_end').val('');
+            $('#id_pay').val(empPay);
+            $('#id_break').val(empBreak);
         });
 
         function to_12h(time) {
@@ -334,6 +382,8 @@
                     <a href="#updateAttendanceModal" data-attnid="${d.id}"
                     data-start="${start_time}"
                     data-end="${end_time_data}"
+                    data-pay="${d.pay}"
+                    data-break="${d.break}"
                     class="update-attendance btn ${button_cls} btn-icon-split m-1">
                         <span class="icon text-white-50">
                             <i class="fas ${button_icon}"></i>
@@ -364,6 +414,8 @@
                 'date': date,
                 'start': $("#id_start").val(),
                 'end': $("#id_end").val(),
+                'pay': $("#id_pay").val(),
+                'break': $("#id_break").val()
             }
             $.ajax({
                 url: '/attendance/',
@@ -386,6 +438,8 @@
             let payload = {
                 'start': $("#uid_start").val(),
                 'end': $("#uid_end").val(),
+                'pay': $("#uid_pay").val(),
+                'break': $("#uid_break").val()
             }
             $.ajax({
                 url: '/attendance/' + attnId + "/update/",

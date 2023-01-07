@@ -231,6 +231,17 @@
                         </div>
                     </div>
                     <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.daily_break_hours.field.required %}
+                                <b>{% endif %}{{ form.daily_break_hours.label_tag }}
+                            {% if form.daily_break_hours.field.required %}</b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.daily_break_hours }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
                 </div>
             </div>
         </div>

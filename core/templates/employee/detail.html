@@ -1,39 +1,34 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
 {% block content %}
-    <div class="container-fluid">
-        <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-5">
-            <div class="col-8">
-                <h1 class="h3 mb-0 text-gray-800">{{ obj.full_name }}</h1>
-            </div>
-            <div class="col-4">
-                <a href="{% url 'employee_attendance' pk=obj.id %}"
-                   class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm m-1"><i
-                        class="fas fa-calendar fa-sm text-white-50"></i>&nbsp View
-                    Attendance</a>
-                <a href="{% url 'employee_update' pk=obj.id %}"
-                   class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm m-1"><i
-                        class="fas fa-pencil fa-sm text-white-50"></i>&nbsp Update
-                    Employee</a>
-            </div>
-        </div>
-    </div>
+    {% include "commons/employee_header.html" %}
     <div class="container-fluid">
         <div class="accordion" id="accordionExample">
             <div class="card shadow mb-4">
                 <div class="card-header" id="personalDetails">
-                    <h2 class="mb-0">
-                        <button class="btn btn-light text-left"
-                                type="button" data-toggle="collapse"
-                                data-target="#collapseOne"
-                                aria-expanded="true"
-                                aria-controls="collapseOne">
-                            <h5>
-                                Personal Details
-                            </h5>
-                        </button>
-                    </h2>
+                    <div class="row">
+                        <div class="col-11">
+                            <h2 class="mb-0">
+                                <button class="btn btn-light text-left"
+                                        type="button" data-toggle="collapse"
+                                        data-target="#collapseOne"
+                                        aria-expanded="true"
+                                        aria-controls="collapseOne">
+                                    <h5>
+                                        Personal Details
+                                    </h5>
+                                </button>
+                            </h2>
+                        </div>
+                        <div class="col-1">
+                            <a href="{% url 'employee_update' pk=employee.id %}"
+                               class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm m-1"><i
+                                    class="fas fa-pencil fa-sm text-white-50"></i>&nbsp
+                                Edit</a>
+                        </div>
+                    </div>
+
+
                 </div>
 
                 <div id="collapseOne" class="collapse show"
@@ -47,7 +42,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.first_name }}
+                                {{ employee.first_name }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -58,7 +53,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.middle_name }}
+                                {{ employee.middle_name }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -69,7 +64,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.last_name }}
+                                {{ employee.last_name }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -80,7 +75,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.phone }}
+                                {{ employee.phone }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -91,7 +86,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.email }}
+                                {{ employee.email }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -102,7 +97,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.gender }}
+                                {{ employee.gender }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -113,7 +108,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.date_of_birth }} ({{ obj.age }} years)
+                                {{ employee.date_of_birth }} ({{ employee.age }} years)
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -124,7 +119,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.address_line1 }}
+                                {{ employee.address_line1 }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -135,7 +130,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.address_line2 }}
+                                {{ employee.address_line2 }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -146,7 +141,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.address_line3 }}
+                                {{ employee.address_line3 }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -157,7 +152,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.city }}
+                                {{ employee.city }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -168,7 +163,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.state }}
+                                {{ employee.state }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -179,7 +174,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.country }}
+                                {{ employee.country }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -212,7 +207,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.department.name }}
+                                {{ employee.department.name }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -223,7 +218,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.role }}
+                                {{ employee.role }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -234,7 +229,7 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.joined_date }}
+                                {{ employee.joined_date }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">
@@ -245,7 +240,18 @@
                                 </b>
                             </div>
                             <div class="col col-8">
-                                {{ obj.hourly_pay }}
+                                {{ employee.hourly_pay }}
+                            </div>
+                        </div>
+                        <hr class="sidebar-divider my-0">
+                        <div class="row row-cols-2 m-3">
+                            <div class="col col-4">
+                                <b>
+                                    Daily Break Hours
+                                </b>
+                            </div>
+                            <div class="col col-8">
+                                {{ employee.daily_break_hours }}
                             </div>
                         </div>
                         <hr class="sidebar-divider my-0">

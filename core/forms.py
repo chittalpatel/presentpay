@@ -1,3 +1,5 @@
+import datetime
+
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -28,6 +30,7 @@ class EmployeeForm(forms.ModelForm):
             "role",
             "joined_date",
             "hourly_pay",
+            "daily_break_hours",
         )
 
     def __init__(self, *args, **kwargs):
@@ -39,7 +42,6 @@ class EmployeeForm(forms.ModelForm):
         )
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"] = "form-control form-control-user"
-            print(visible.field.required)
 
 
 class AttendanceForm(forms.ModelForm):
@@ -53,3 +55,34 @@ class AttendanceForm(forms.ModelForm):
         end = cleaned_data.get("end")
         if start and end and start > end:
             raise ValidationError("Start time cannot be greater than end time.")
+
+
+class BillingFilterForm(forms.Form):
+    MONTH_CHOICES = [
+        (1, "January"),
+        (2, "February"),
+        (3, "March"),
+        (4, "April"),
+        (5, "May"),
+        (6, "June"),
+        (7, "July"),
+        (8, "August"),
+        (9, "September"),
+        (10, "October"),
+        (11, "November"),
+        (12, "December"),
+    ]
+    month = forms.ChoiceField(
+        choices=MONTH_CHOICES, required=True, initial=datetime.date.today().month
+    )
+    year = forms.IntegerField(
+        min_value=2020,
+        max_value=datetime.date.today().year,
+        required=True,
+        initial=datetime.date.today().year,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs["class"] = "form-control form-control-user"

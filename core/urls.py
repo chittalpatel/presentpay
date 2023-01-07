@@ -23,6 +23,11 @@ urlpatterns = [
         views.list_employee_attendances,
         name="employee_attendance",
     ),
+    path(
+        "employees/billing/<int:pk>/",
+        views.view_employee_billing,
+        name="employee_billing",
+    ),
     path("attendance/", views.attendance, name="attendance"),
     path(
         "attendance/<int:attn_id>/update/",
