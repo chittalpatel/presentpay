@@ -1,4 +1,7 @@
+import enum
+
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -13,6 +16,15 @@ class Company(models.Model):
     city = models.CharField(max_length=255, blank=False, null=False)
     state = models.CharField(max_length=2, blank=False, null=False)
     country = models.CharField(max_length=2, blank=False, null=False)
+
+    # settings
+    shift_start_time = models.TimeField(blank=True, null=True)
+    ceiling_minutes = models.PositiveSmallIntegerField(
+        blank=False,
+        null=False,
+        default=0,
+        validators=[MaxValueValidator(59), MinValueValidator(0)],
+    )
 
 
 class User(AbstractUser):

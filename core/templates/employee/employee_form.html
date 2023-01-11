@@ -233,12 +233,25 @@
                     <hr class="sidebar-divider my-0">
                     <div class="row row-cols-2 m-3">
                         <div class="col col-4">
-                            {% if form.daily_break_hours.field.required %}
-                                <b>{% endif %}{{ form.daily_break_hours.label_tag }}
-                            {% if form.daily_break_hours.field.required %}</b>{% endif %}
+                            {% if form.daily_break_minutes.field.required %}
+                                <b>{% endif %}{{ form.daily_break_minutes.label_tag }}
+                            {% if form.daily_break_minutes.field.required %}
+                                </b>{% endif %}
                         </div>
                         <div class="col col-8">
-                            {{ form.daily_break_hours }}
+                            {{ form.daily_break_minutes }}
+                        </div>
+                    </div>
+                    <hr class="sidebar-divider my-0">
+                    <div class="row row-cols-2 m-3">
+                        <div class="col col-4">
+                            {% if form.shift_start_time.field.required %}
+                                <b>{% endif %}{{ form.shift_start_time.label_tag }}
+                            {% if form.shift_start_time.field.required %}
+                                </b>{% endif %}
+                        </div>
+                        <div class="col col-8">
+                            {{ form.shift_start_time }}
                         </div>
                     </div>
                     <hr class="sidebar-divider my-0">
@@ -249,3 +262,18 @@
                 style="width: 100%">{{ btn_name|default:"Submit" }}</button>
     </div>
 </form>
+<script>
+    let errors = ""
+    {% for field in form %}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                errors = errors + `{{ field.name }}: {{ error|escape }}` +"\n"
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    document.addEventListener('DOMContentLoaded', function() {
+        if (errors) {
+            alert(errors)
+        }
+    }, false);
+</script>

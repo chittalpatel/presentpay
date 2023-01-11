@@ -8,10 +8,11 @@ from django.http import JsonResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
+from django.db.models import Q
 
 from core.forms import EmployeeForm, BillingFilterForm
 from core.models import Employee, Attendance
-from core.utils import str_to_time, str_to_date
+from core.utils import str_to_time, str_to_date, get_time_diff, seconds_to_hours_minutes
 
 
 def test(request):
@@ -78,6 +79,25 @@ class UpdateEmployeeView(UpdateView):
         return reverse_lazy("employee_detail", kwargs={"pk": emp_id})
 
 
+def is_duplicate_attendance(date, start, end, exclude=None):
+    if end:
+        return (
+            Attendance.objects.filter(
+                (Q(start__lte=start) & Q(end__gt=start))
+                | (Q(start__lt=end) & Q(end__gte=end))
+                | (Q(start__gte=start) & Q(end__lte=end)),
+                date=date,
+                is_deleted=False,
+            )
+            .exclude(pk=exclude)
+            .exists()
+        )
+    return Attendance.objects.filter(
+        Q(start__lte=start) & Q(end__gt=start),
+        date=date,
+    ).exists()
+
+
 @login_required
 def attendance(request):
     if request.method == "GET":
@@ -114,18 +134,29 @@ def attendance(request):
     elif request.method == "POST":
         employee = get_employee_by_pk(pk=request.POST["employee_id"], user=request.user)
         date = str_to_date(request.POST["date"])
-        Attendance.objects.create(
+        start = str_to_time(request.POST["start"])
+        end = str_to_time(request.POST["end"])
+        created = False
+        if not is_duplicate_attendance(date, start, end):
+            Attendance.objects.create(
+                employee=employee,
+                date=date,
+                start=start,
+                end=end,
+                hourly_pay=int(request.POST["pay"]),
+                daily_break_minutes=int(request.POST["break"]),
+            )
+            created = True
+        return get_attendance_by_employee(
             employee=employee,
             date=date,
-            start=str_to_time(request.POST["start"]),
-            end=str_to_time(request.POST["end"]),
-            hourly_pay=int(request.POST["pay"]),
-            break_hours=int(request.POST["break"]),
+            message=None
+            if created
+            else "Attendance is overlapping with existing attendance",
         )
-        return get_attendance_by_employee(employee=employee, date=date)
 
 
-def get_attendance_by_employee(employee, date):
+def get_attendance_by_employee(employee, date, message=None):
     attendances = (
         Attendance.objects.filter(date=date, employee=employee, is_deleted=False)
         .order_by("start")
@@ -139,10 +170,11 @@ def get_attendance_by_employee(employee, date):
                 "end": attn.end,
                 "is_valid": attn.is_valid,
                 "pay": attn.hourly_pay,
-                "break": attn.break_hours,
+                "break": attn.break_minutes,
             }
             for attn in attendances
-        ]
+        ],
+        "message": message,
     }
     return JsonResponse(response)
 
@@ -159,12 +191,23 @@ def update_attendance(request, attn_id):
     if request.method == "POST":
         attn = get_attendance_or_404(attn_id)
         emp = get_employee_by_pk(attn.employee_id, request.user)
-        attn.start = str_to_time(request.POST["start"])
-        attn.end = str_to_time(request.POST["end"])
-        attn.hourly_pay = int(request.POST["pay"])
-        attn.break_hours = int(request.POST["break"])
-        attn.save()
-        return get_attendance_by_employee(employee=emp, date=attn.date)
+        start = str_to_time(request.POST["start"])
+        end = str_to_time(request.POST["end"])
+        updated = False
+        if not is_duplicate_attendance(attn.date, start, end, exclude=attn.id):
+            attn.start = start
+            attn.end = end
+            attn.hourly_pay = int(request.POST["pay"])
+            attn.break_minutes = int(request.POST["break"])
+            attn.save()
+            updated = True
+        return get_attendance_by_employee(
+            employee=emp,
+            date=attn.date,
+            message=None
+            if updated
+            else "Attendance is overlapping with existing attendance",
+        )
 
 
 @login_required
@@ -192,7 +235,7 @@ def list_employee_attendances(request, pk):
         end = start
 
     date_map = {
-        (start + datetime.timedelta(days=x)): [] for x in range((end - start).days + 1)
+        (end - datetime.timedelta(days=x)): [] for x in range((end - start).days + 1)
     }
     attns = (
         Attendance.objects.filter(
@@ -220,34 +263,39 @@ def view_employee_billing(request, pk):
         month = datetime.date.today().month
         year = datetime.date.today().year
 
-    data = {
-        "cost": 0,
-        "work_hours": 0,
-        "break_hours": 0,
-    }
     attns = Attendance.objects.filter(
         employee=emp,
         date__year=year,
         date__month=month,
         is_deleted=False,
     ).all()
+
+    data = {
+        "cost": 0,
+        "work": (0, 0),
+    }
+    ceiling_minutes = request.user.company.ceiling_minutes
     for attn in attns:
         if not attn.is_valid:
             continue
-        work_hours = round(
-            (
-                datetime.datetime.combine(datetime.date.min, attn.end)
-                - datetime.datetime.combine(datetime.date.min, attn.start)
-            ).total_seconds()
-            / 3600,
-            2,
-        )
-        data["work_hours"] += work_hours
-        data["break_hours"] += attn.break_hours
-        data["cost"] += max(work_hours - attn.break_hours, 0) * attn.hourly_pay
 
-    data["cost"] = round(data["cost"], 2)
-    data["net_hours"] = max(data["work_hours"] - data["break_hours"], 0)
+        work_seconds = get_time_diff(start=attn.start, end=attn.end)
+        break_seconds = attn.break_minutes * 60
+        effective_seconds = max(work_seconds - break_seconds, 0)
+        hours, minutes = seconds_to_hours_minutes(effective_seconds)
+        if (minutes + ceiling_minutes) >= 60:
+            hours += 1
+            minutes = 0
+        hours_in_decimal = hours + (minutes / 60)
+        cost = hours_in_decimal * attn.hourly_pay
+
+        data["work"] = (data["work"][0] + hours, data["work"][1] + minutes)
+        data["cost"] += cost
+
+    data["cost"] = round(data["cost"])
+    data["work"] = (data["work"][0] + (data["work"][1] // 60), data["work"][1] % 60)
+    data["work"] = f"{data['work'][0]} hours and {data['work'][1]} minutes"
+
     return render(
         request,
         "billing/employee_billing.html",

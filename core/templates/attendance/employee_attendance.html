@@ -31,7 +31,8 @@
                            data-empid="{{ employee.id }}"
                            data-empname="{{ employee.full_name }}"
                            data-emppay="{{ employee.hourly_pay }}"
-                           data-empbreak="{{ employee.daily_break_hours }}">
+                           data-empbreak="{{ employee.daily_break_minutes }}"
+                           data-empshift="{{ info.0.shift_start_time|time:"g:i A" }}">
                         <thead>
                         <tr>
                             <th>Date</th>
@@ -50,52 +51,36 @@
                                         {% if attn.is_valid %}
                                             <a href="#updateAttendanceModal"
                                                data-attnid="{{ attn.id }}"
-                                               data-start="{{ attn.start|time:"f A" }}"
-                                               data-end="
-
-
-
-
-
-
-
-                                                       {% if attn.end %}{{ attn.end|time:"f A" }}{% endif %}"
+                                               data-start="{{ attn.start|time:"g:i A" }}"
+                                               data-end="{% if attn.end %}{{ attn.end|time:"g:i A" }}{% endif %}"
                                                data-pay="{{ attn.hourly_pay }}"
-                                               data-break="{{ attn.break_hours }}"
+                                               data-break="{{ attn.break_minutes }}"
                                                class="update-attendance btn btn-info btn-icon-split m-1">
                                         <span class="icon text-white-50">
                                             <i class="fas fa-check"></i>
                                         </span>
                                                 <span class="text">
-                                            {{ attn.start|time:"f A" }} -
+                                            {{ attn.start|time:"g:i A" }} -
                                                     {% if attn.end %}
-                                                        {{ attn.end|time:"f A" }}{% else %}
+                                                        {{ attn.end|time:"g:i A" }}{% else %}
                                                         (?){% endif %}
                                         </span>
                                             </a>
                                         {% else %}
                                             <a href="#updateAttendanceModal"
                                                data-attnid="{{ attn.id }}"
-                                               data-start="{{ attn.start|time:"f A" }}"
-                                               data-end="
-
-
-
-
-
-
-
-                                                       {% if attn.end %}{{ attn.end|time:"f A" }}{% endif %}"
+                                               data-start="{{ attn.start|time:"g:i A" }}"
+                                               data-end="{% if attn.end %}{{ attn.end|time:"g:i A" }}{% endif %}"
                                                data-pay="{{ attn.hourly_pay }}"
-                                               data-break="{{ attn.break_hours }}"
+                                               data-break="{{ attn.break_minutes }}"
                                                class="update-attendance btn btn-warning btn-icon-split m-1">
                                         <span class="icon text-white-50">
                                             <i class="fas fa-exclamation-triangle"></i>
                                         </span>
                                                 <span class="text">
-                                            {{ attn.start|time:"f A" }} -
+                                            {{ attn.start|time:"g:i A" }} -
                                                     {% if attn.end %}
-                                                        {{ attn.end|time:"f A" }}{% else %}
+                                                        {{ attn.end|time:"g:i A" }}{% else %}
                                                         (?){% endif %}
                                         </span>
                                             </a>
@@ -172,7 +157,7 @@
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="uid_break">Break Hours</label>
+                                    <label for="uid_break">Break Minutes</label>
                                     <input name="break" type="number" min="0"
                                            class="form-control form-control-user"
                                            id="uid_break">
@@ -250,7 +235,7 @@
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="id_break">Break Hours</label>
+                                    <label for="id_break">Break Minutes</label>
                                     <input name="break" type="number" min="0"
                                            class="form-control form-control-user"
                                            id="id_break">
@@ -278,7 +263,7 @@
     <script>
         let table = $('#dataTable').DataTable({
             paging: false,
-            ordering: true,
+            ordering: false,
             info: false,
             searching: true,
             columnDefs: [
@@ -321,6 +306,7 @@
         let empName = $('#dataTable').data('empname');
         let empPay = $('#dataTable').data('emppay');
         let empBreak = $('#dataTable').data('empbreak');
+        let empShift = $('#dataTable').data('empshift');
         $(document).on("click", ".update-attendance", function () {
             let attnId = $(this).data('attnid');
             let start = $(this).data('start');
@@ -350,6 +336,12 @@
         $(document).on("click", ".add-attendance", function () {
             let date = $(this).closest('td').attr('id');
             let fdate = $(this).closest('td').data('fdate');
+            let start = empShift;
+            if (!start) {
+                start = new Date().toLocaleString(
+                    'en-US', {hour: 'numeric', minute: 'numeric', hour12: true}
+                )
+            }
             $('#id_employee')
                 .find('option')
                 .remove()
@@ -360,9 +352,7 @@
                 .remove()
                 .end()
                 .append(`<option value="${date}" selected>${fdate}</option>`);
-            $('#id_start').val(new Date().toLocaleString(
-                'en-US', {hour: 'numeric', minute: 'numeric', hour12: true}
-            ));
+            $('#id_start').val(start);
             $('#id_end').val('');
             $('#id_pay').val(empPay);
             $('#id_break').val(empBreak);
@@ -440,6 +430,9 @@
                 success: function (d) {
                     populate_cell(d.data, date)
                     $('#addAttendanceModal').modal('hide');
+                    if(d.message){
+                        alert(d.message)
+                    }
                 }
             });
         });
@@ -463,6 +456,9 @@
                 success: function (d) {
                     populate_cell(d.data, date)
                     $('#updateAttendanceModal').modal('hide');
+                    if(d.message){
+                        alert(d.message)
+                    }
                 }
             });
         });

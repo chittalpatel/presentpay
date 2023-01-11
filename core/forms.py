@@ -9,6 +9,7 @@ from core.models import Department, Employee, Attendance
 class EmployeeForm(forms.ModelForm):
     date_of_birth = forms.CharField(widget=forms.TextInput(attrs={"type": "date"}))
     joined_date = forms.CharField(widget=forms.TextInput(attrs={"type": "date"}))
+    shift_start_time = forms.CharField(widget=forms.TextInput(attrs={"type": "time"}))
 
     class Meta:
         model = Employee
@@ -30,7 +31,8 @@ class EmployeeForm(forms.ModelForm):
             "role",
             "joined_date",
             "hourly_pay",
-            "daily_break_hours",
+            "daily_break_minutes",
+            "shift_start_time",
         )
 
     def __init__(self, *args, **kwargs):
@@ -39,6 +41,11 @@ class EmployeeForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["department"] = forms.ModelChoiceField(
             queryset=Department.objects.filter(company=user.company)
+        )
+        self.fields["shift_start_time"] = forms.CharField(
+            widget=forms.TextInput(attrs={"type": "time"}),
+            initial=user.company.shift_start_time,
+            required=False,
         )
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"] = "form-control form-control-user"
