@@ -84,12 +84,15 @@ WSGI_APPLICATION = "presentpay.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': f'django.db.backends.{os.getenv("DB_ENGINE", "sqlite3")}',
+        'NAME': os.getenv("DB_NAME", BASE_DIR / "db.sqlite3") or BASE_DIR / "db.sqlite3",
+        'USER': os.getenv('DB_USER', ''),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', ''),
+        'PORT': os.getenv('DB_PORT', ''),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
