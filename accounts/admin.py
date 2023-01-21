@@ -8,7 +8,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ("id", "username", "is_staff", "associated_company")
 
     def associated_company(self, obj):
-        return obj.company.name
+        return obj.company.name if obj.company else None
 
 
 @admin.register(Company)
